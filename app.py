@@ -1,7 +1,6 @@
 from flask import Flask
-from auth.routes import auth
 from db.database import Base,Engine
-from auth.models import *
+from auth.routes import auth
 
 ######## initDB  for creating the Table ##########
 base = Base();
