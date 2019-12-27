@@ -16,7 +16,7 @@ dirspec==13.10
 dnspython==1.11.1
 duplicity==0.6.23
 enum34==1.1.6
-Flask==0.12.2
+Flask==1.0
 Flask-MongoAlchemy==0.7.2
 Flask-Triangle==0.5.3
 functools32==3.2.3.post2
