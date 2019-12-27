@@ -10,13 +10,13 @@ CONFIG_PATH = os.path.join(HERE, './serviceConfig.ini')
 ConfigINI = configparser.ConfigParser()
 
 ConfigINI.read(CONFIG_PATH)
-print(ConfigINI.read(CONFIG_PATH))
 ######## DB settings for serviceConfigS CONFIG ##########
 SC_DB_HOST = ConfigINI.get('ServicesConfig', 'DB_HOST')
 SC_DB_NAME = ConfigINI.get('ServicesConfig', 'DB_NAME')
 SC_DB_USER = ConfigINI.get('ServicesConfig', 'DB_USER')
 SC_DB_PASS = ConfigINI.get('ServicesConfig', 'DB_PASS')
 services_config_uri = 'postgresql://%s:%s@%s/%s'%(SC_DB_USER, SC_DB_PASS, SC_DB_HOST, SC_DB_NAME)
+print(services_config_uri);
 Engine = create_engine(services_config_uri, convert_unicode=True)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=Engine)
 
