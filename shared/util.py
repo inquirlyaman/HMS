@@ -10,11 +10,18 @@ VALID_EMAIL_REGEX = re.compile(
             r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
                 r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
                     r')@(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?$', re.IGNORECASE)
+VALID_MOBILE_REGEX = re.compile("^[0-9]{10}$")
 #validate email id 
 def validate_email(email_id):
     INVALID_EMAIL = ConfigINI.get('MessageConfig', 'INVALID_EMAIL_MESSAGE')
     if not VALID_EMAIL_REGEX.match(email_id):
         return {'status': 'error','message':INVALID_EMAIL}
+    return {'status': 'success'}
+#validate mobile
+def validate_mobile(mobile_number):
+    if not VALID_MOBILE_REGEX.match(mobile_number):
+        return {'status': 'error',
+                'message': '"'+mobile_number+'" is not a valid mobile number'}
     return {'status': 'success'}
 #validate password
 def valid_password(passowrd,confirm_password):
@@ -25,3 +32,5 @@ def valid_password(passowrd,confirm_password):
 def password_hash(password):
     hash_password = pbkdf2_sha256.hash("password")
     return hash_password
+def verify_password(password,input_password):
+    return pbkdf2_sha256.verify(password,input_password)
