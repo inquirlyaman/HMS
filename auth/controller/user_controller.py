@@ -1,9 +1,11 @@
 from auth.models import *
 from db.database import Base,Engine,session_context
 from shared.util import *
-
+import jwt
+import datetime
+key = 'HMS'
 ######## save_user ##########
-def save_user(request):
+def save_user(request,role):
     name = request.json.get("name")
     email = request.json.get("email")
     mobile = request.json.get("mobile")
@@ -35,7 +37,7 @@ def save_user(request):
         user = User(hash_password,hash_confirm_password)
         dbsession.add(user)
         dbsession.commit()
-        role = Roles("nurse")
+        role = Roles(role)
         dbsession.add(role)
         dbsession.commit()
         user_roles = UserRoles(role.id,user.id)
@@ -88,10 +90,33 @@ def get_user(request):
         total = dbsession.query(User).count()
         for user in users:
             users_info.append(user_json(user))
-        print(total);
         return dict(status='success',
                     users=users_info,
-                    total=total) 
+                    total=total)
+######validate  user#######
+def validate_user(request):
+    email = request.json.get('email')
+    password = request.json.get('password')
+    if not email :
+        return dict(status='error', message="Email ids can't be empty")
+    if not password:
+        return dict(status ='error', message= "password can't be empty")
+    if email :
+        status = validate_email(email.strip())
+        if(status['status'] == 'error'):
+            return status
+    with session_context() as dbsession:
+        user_profile =  dbsession.query(UserProfiles).filter_by(email = email).first()
+        user = dbsession.query(User).filter_by(id =user_profile.id).first()
+        user_roles =  dbsession.query(UserRoles).filter_by(user_id = user.id).first()
+        roles =  dbsession.query(Roles).filter_by(id = user_roles.role_id).first()
+        if user is None or user_profile is None:
+            return dict(status="error", 
+                            message="Invalid User Id")
+        if(verify_password(password, user.password)):
+            access_token = jwt.encode({'user': action_token_object(user_profile,roles), 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30) }, key)
+            return dict(access_token=access_token.decode('UTF-8')), 200
+            
 ######return user json######
 def user_json(user):
         info = {}
@@ -101,3 +126,8 @@ def user_json(user):
         info['mobile'] = user.mobile
         info['address'] = user.address
         return info
+def action_token_object(user_profile,roles):
+    info = {}
+    info['name'] = user_profile.name
+    info['role'] = roles.name
+    return info
