@@ -53,7 +53,6 @@ def update_user(request):
     mobile = request.json.get("mobile")
     address = request.json.get("address")
     user_id = request.json.get("id")
-    print(user_id);
     if  not name :
             return dict(status='error', message="Name can not be empty")
     if not email :

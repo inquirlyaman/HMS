@@ -80,3 +80,19 @@ def is_admin(f):
                     message ='Token is invalid '),403
         return f(*args,**kwargs)
     return decorated
+def is_admin_doctor_nurse(f):
+    @wraps(f)
+    def decorated(*args,**kwargs):
+        access_token = request.headers.get('token')
+        if not access_token:
+            return dict(status='error',
+                    message ='Token is missing '),403
+        try:
+            data = jwt.decode(access_token, key)
+            if(data['user']['role'] != 'admin' or data['user']['role'] != 'nurse') :
+                return dict(status='error', message='Access Forbidden'),403
+        except:
+            return dict(status='error',
+                    message ='Token is invalid '),403
+        return f(*args,**kwargs)
+    return decorated
